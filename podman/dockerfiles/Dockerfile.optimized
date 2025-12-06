@@ -1,0 +1,55 @@
+# ✅ DOCKERFILE OPTIMIZADO - MEJORES PRÁCTICAS
+# Beneficios:
+# 1. Multistage build (separa build de runtime)
+# 2. Usa imagen JRE ligera (no JDK completo)
+# 3. Usuario no-root para seguridad
+# 4. Optimización de capas
+# 5. Solo incluye el JAR final
+
+# STAGE 1: Build
+FROM eclipse-temurin:17-jdk AS builder
+
+# Instalar Maven
+RUN apt-get update && apt-get install -y maven && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copiar solo pom.xml primero (mejor cache de capas)
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
+
+# Copiar código fuente y compilar
+COPY src ./src
+RUN mvn clean package -DskipTests -B
+
+# STAGE 2: Runtime
+FROM eclipse-temurin:17-jre
+
+# Crear usuario no-root para seguridad
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+
+# Instalar herramientas mínimas necesarias
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copiar solo el JAR desde el stage anterior
+COPY --from=builder /app/target/demo-app-1.0.0.jar app.jar
+
+# Cambiar ownership al usuario no-root
+RUN chown appuser:appuser app.jar
+
+# Cambiar a usuario no-root
+USER appuser
+
+# Configurar JVM para contenedores
+ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+EXPOSE 8080
+
+# Usar exec form para mejor manejo de señales
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
