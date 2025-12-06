@@ -1,0 +1,25 @@
+# ❌ DOCKERFILE MAL OPTIMIZADO - NO USAR EN PRODUCCIÓN
+# Problemas:
+# 1. Usa imagen completa de OpenJDK (muy pesada)
+# 2. Incluye Maven y código fuente en la imagen final
+# 3. No usa multistage build
+# 4. No optimiza capas
+# 5. Ejecuta como root
+
+FROM eclipse-temurin:17-jdk
+
+# Instalar Maven (innecesario en imagen final)
+RUN apt-get update && apt-get install -y maven
+
+# Copiar todo el código fuente (innecesario en imagen final)
+COPY . /app
+WORKDIR /app
+
+# Compilar en la misma imagen (genera archivos temporales)
+RUN mvn clean package -DskipTests
+
+# Exponer puerto
+EXPOSE 8080
+
+# Ejecutar como root (inseguro)
+CMD ["java", "-jar", "target/demo-app-1.0.0.jar"]
