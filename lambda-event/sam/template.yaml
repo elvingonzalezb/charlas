@@ -1,0 +1,151 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Lambda Event Architecture - SAM Template
+
+Parameters:
+  EventBridgeBusName:
+    Type: String
+    Description: Nombre del EventBridge Bus
+  SNSTopicArn:
+    Type: String
+    Description: ARN del SNS Topic
+  SQSWebUrl:
+    Type: String
+    Description: URL de la cola SQS Web
+  SQSAppUrl:
+    Type: String
+    Description: URL de la cola SQS App
+  SQSWhatsAppUrl:
+    Type: String
+    Description: URL de la cola SQS WhatsApp
+  LambdaReceptorRoleArn:
+    Type: String
+    Description: ARN del rol IAM para lambdas receptoras
+  LambdaProcesadorRoleArn:
+    Type: String
+    Description: ARN del rol IAM para lambdas procesadoras
+  EventBridgeRuleWebArn:
+    Type: String
+    Description: ARN de la regla EventBridge Web
+  EventBridgeRuleAppArn:
+    Type: String
+    Description: ARN de la regla EventBridge App
+  EventBridgeRuleWhatsAppArn:
+    Type: String
+    Description: ARN de la regla EventBridge WhatsApp
+
+Globals:
+  Function:
+    Runtime: python3.9
+    Timeout: 30
+    MemorySize: 256
+
+Resources:
+  # Lambdas Receptoras
+  WebReceptorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: lambda-event-web-receptor
+      CodeUri: ../lambdas/receptoras/web/
+      Handler: handler.lambda_handler
+      Role: !Ref LambdaReceptorRoleArn
+      Environment:
+        Variables:
+          SNS_TOPIC_ARN: !Ref SNSTopicArn
+      Events:
+        EventBridgeRule:
+          Type: EventBridgeRule
+          Properties:
+            EventBusName: !Ref EventBridgeBusName
+            Pattern:
+              source:
+                - com.miapp.web
+
+  AppReceptorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: lambda-event-app-receptor
+      CodeUri: ../lambdas/receptoras/app/
+      Handler: handler.lambda_handler
+      Role: !Ref LambdaReceptorRoleArn
+      Environment:
+        Variables:
+          SNS_TOPIC_ARN: !Ref SNSTopicArn
+      Events:
+        EventBridgeRule:
+          Type: EventBridgeRule
+          Properties:
+            EventBusName: !Ref EventBridgeBusName
+            Pattern:
+              source:
+                - com.miapp.app
+
+  WhatsAppReceptorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: lambda-event-whatsapp-receptor
+      CodeUri: ../lambdas/receptoras/whatsapp/
+      Handler: handler.lambda_handler
+      Role: !Ref LambdaReceptorRoleArn
+      Environment:
+        Variables:
+          SNS_TOPIC_ARN: !Ref SNSTopicArn
+      Events:
+        EventBridgeRule:
+          Type: EventBridgeRule
+          Properties:
+            EventBusName: !Ref EventBridgeBusName
+            Pattern:
+              source:
+                - com.miapp.whatsapp
+
+  # Lambdas Procesadoras
+  WebProcesadorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: lambda-event-web-procesador
+      CodeUri: ../lambdas/procesadoras/web/
+      Handler: handler.lambda_handler
+      Role: !Ref LambdaProcesadorRoleArn
+      Events:
+        SQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !Sub "arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:lambda-event-web-queue"
+            BatchSize: 10
+
+  AppProcesadorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: lambda-event-app-procesador
+      CodeUri: ../lambdas/procesadoras/app/
+      Handler: handler.lambda_handler
+      Role: !Ref LambdaProcesadorRoleArn
+      Events:
+        SQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !Sub "arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:lambda-event-app-queue"
+            BatchSize: 10
+
+  WhatsAppProcesadorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: lambda-event-whatsapp-procesador
+      CodeUri: ../lambdas/procesadoras/whatsapp/
+      Handler: handler.lambda_handler
+      Role: !Ref LambdaProcesadorRoleArn
+      Events:
+        SQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !Sub "arn:aws:sqs:${AWS::Region}:${AWS::AccountId}:lambda-event-whatsapp-queue"
+            BatchSize: 10
+
+Outputs:
+  WebReceptorFunctionArn:
+    Value: !GetAtt WebReceptorFunction.Arn
+  AppReceptorFunctionArn:
+    Value: !GetAtt AppReceptorFunction.Arn
+  WhatsAppReceptorFunctionArn:
+    Value: !GetAtt WhatsAppReceptorFunction.Arn

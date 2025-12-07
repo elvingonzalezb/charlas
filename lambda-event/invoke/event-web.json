@@ -1,0 +1,8 @@
+[
+  {
+    "Source": "com.miapp.web",
+    "DetailType": "mensaje.recibido",
+    "Detail": "{\"usuario\": \"Elvin\", \"mensaje\": \"Hola Elvin, este es un mensaje desde Web\", \"timestamp\": \"2024-12-07T10:00:00Z\"}",
+    "EventBusName": "lambda-event-dev-bus"
+  }
+]
