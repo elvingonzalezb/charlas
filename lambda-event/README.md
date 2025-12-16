@@ -104,3 +104,10 @@ event_pattern = jsonencode({
 })
 
 "EventBridge es un sistema de mensajería ciego; solo compara textos. Usamos com.empresa.servicio para poner orden y etiqueta a nuestros paquetes, asegurándonos de que nadie más en la cuenta de AWS use la misma etiqueta por accidente."
+
+
+https://serverlessland.com/patterns
+
+https://docs.aws.amazon.com/eventbridge/
+
+https://repost.aws/es/knowledge-center/lambda-function-idempotent
