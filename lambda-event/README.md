@@ -105,6 +105,74 @@ event_pattern = jsonencode({
 
 "EventBridge es un sistema de mensajería ciego; solo compara textos. Usamos com.empresa.servicio para poner orden y etiqueta a nuestros paquetes, asegurándonos de que nadie más en la cuenta de AWS use la misma etiqueta por accidente."
 
+## Idempotencia en la Arquitectura
+
+Para garantizar que los mensajes se procesen una sola vez, cada servicio AWS proporciona identificadores únicos:
+
+### EventBridge
+**Atributo:** `id`
+```json
+{
+  "version": "0",
+  "id": "12345678-1234-1234-1234-123456789012",  // ← ID único del evento
+  "detail-type": "mensaje.recibido",
+  "source": "com.miapp.web",
+  "detail": {...}
+}
+```
+**Uso:** Almacenar `event['id']` en DynamoDB/Redis para detectar duplicados.
+
+### SNS
+**Atributo:** `MessageId`
+```json
+{
+  "Type": "Notification",
+  "MessageId": "12345678-1234-1234-1234-123456789012",  // ← ID único del mensaje SNS
+  "TopicArn": "arn:aws:sns:...",
+  "Message": "{...}"
+}
+```
+**Uso:** Almacenar `body['MessageId']` para evitar procesar el mismo mensaje SNS dos veces.
+
+### SQS
+**Atributo:** `messageId`
+```json
+{
+  "Records": [{
+    "messageId": "12345678-1234-1234-1234-123456789012",  // ← ID único del mensaje SQS
+    "receiptHandle": "...",
+    "body": "{...}"
+  }]
+}
+```
+**Uso:** Almacenar `record['messageId']` para detectar reprocesamiento de mensajes SQS.
+
+### Estrategia Recomendada
+
+1. **EventBridge → Lambda Receptora:** Usar `event['id']`
+2. **SNS → SQS → Lambda Procesadora:** Usar `record['messageId']` (SQS)
+3. **Almacenamiento:** DynamoDB con TTL de 24 horas
+4. **Patrón:** Verificar ID antes de procesar, guardar ID después de procesar exitosamente
+
+```python
+# Ejemplo en Lambda
+def lambda_handler(event, context):
+    event_id = event.get('id')  # EventBridge
+    # o
+    message_id = event['Records'][0]['messageId']  # SQS
+    
+    # Verificar si ya procesamos este ID
+    if already_processed(event_id):
+        return {'statusCode': 200, 'body': 'Already processed'}
+    
+    # Procesar mensaje
+    process_message(event)
+    
+    # Marcar como procesado
+    mark_as_processed(event_id)
+```
+
+https://aws.amazon.com/es/what-is/eda/
 
 https://serverlessland.com/patterns
 

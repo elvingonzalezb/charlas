@@ -1,4 +1,4 @@
-# Taller: EventBridge Direct Routing con Terraform y SAM
+# Taller: EventBridge con Terraform y SAM
 
 ## Arquitectura
 ```
@@ -16,9 +16,9 @@ EventBridge Bus → 3 Reglas → 3 Lambdas Receptoras → SNS Topic → 3 SQS �
 
 ### 1. Desplegar Infraestructura (Terraform)
 ```bash
-make terraform-init
-make terraform-plan
-make terraform-apply
+make t-init
+make t-plan
+make t-apply
 ```
 
 Esto crea:
@@ -30,11 +30,11 @@ Esto crea:
 
 ### 2. Desplegar Lambdas (SAM)
 ```bash
-make sam-build
-make sam-deploy
+make s-build
+make s-deploy
 ```
 
-Durante `sam-deploy` te pedirá parámetros. Usa los outputs de Terraform:
+Durante `s-deploy` Usa los outputs de Terraform:
 ```bash
 cd iac && terraform output
 ```
@@ -46,21 +46,21 @@ make deploy-all
 
 ## Probar la Arquitectura
 
-### Opción 1: Ver logs en tiempo real (Terminal 1)
+### Opción 1: Enviar eventos de prueba (Terminal 2)
+```bash
+make test-web       # Probar canal Web
+make test-app       # Probar canal App
+make test-whatsapp  # Probar canal WhatsApp
+make test-all       # Probar los 3 canales
+```
+
+### Opción 2: Ver logs en tiempo real (Terminal 1)
 ```bash
 make logs-web
 # o
 make logs-app
 # o
 make logs-whatsapp
-```
-
-### Opción 2: Enviar eventos de prueba (Terminal 2)
-```bash
-make test-web       # Probar canal Web
-make test-app       # Probar canal App
-make test-whatsapp  # Probar canal WhatsApp
-make test-all       # Probar los 3 canales
 ```
 
 ### Flujo completo de prueba:
