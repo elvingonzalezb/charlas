@@ -65,7 +65,6 @@ s-deploy:
 	  --stack-name lambda-event-stack \
 	  --capabilities CAPABILITY_IAM \
 	  --region us-east-1 \
-	  --resolve-s3 \
 	  --parameter-overrides \
 	    EventBridgeBusName=$$EVENTBRIDGE_BUS_NAME \
 	    SNSTopicArn=$$SNS_TOPIC_ARN \

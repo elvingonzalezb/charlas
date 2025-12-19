@@ -179,3 +179,7 @@ https://serverlessland.com/patterns
 https://docs.aws.amazon.com/eventbridge/
 
 https://repost.aws/es/knowledge-center/lambda-function-idempotent
+
+https://swpatterns.com/
+
+https://www.grahambrooks.com/architecture/

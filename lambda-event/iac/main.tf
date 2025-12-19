@@ -236,3 +236,40 @@ resource "aws_iam_role_policy" "lambda_procesador" {
     ]
   })
 }
+
+# S3 Bucket para SAM
+resource "aws_s3_bucket" "sam_artifacts" {
+  bucket        = "lambda-event-sam-bucket"
+  force_destroy = true
+}
+
+# CloudWatch Log Groups
+resource "aws_cloudwatch_log_group" "web_receptor" {
+  name              = "/aws/lambda/lambda-event-web-receptor"
+  retention_in_days = 14
+}
+
+resource "aws_cloudwatch_log_group" "app_receptor" {
+  name              = "/aws/lambda/lambda-event-app-receptor"
+  retention_in_days = 14
+}
+
+resource "aws_cloudwatch_log_group" "whatsapp_receptor" {
+  name              = "/aws/lambda/lambda-event-whatsapp-receptor"
+  retention_in_days = 14
+}
+
+resource "aws_cloudwatch_log_group" "web_procesador" {
+  name              = "/aws/lambda/lambda-event-web-procesador"
+  retention_in_days = 14
+}
+
+resource "aws_cloudwatch_log_group" "app_procesador" {
+  name              = "/aws/lambda/lambda-event-app-procesador"
+  retention_in_days = 14
+}
+
+resource "aws_cloudwatch_log_group" "whatsapp_procesador" {
+  name              = "/aws/lambda/lambda-event-whatsapp-procesador"
+  retention_in_days = 14
+}

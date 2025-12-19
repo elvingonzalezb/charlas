@@ -41,3 +41,7 @@ output "eventbridge_rule_app_arn" {
 output "eventbridge_rule_whatsapp_arn" {
   value = aws_cloudwatch_event_rule.whatsapp.arn
 }
+
+output "s3_sam_bucket_name" {
+  value = aws_s3_bucket.sam_artifacts.bucket
+}
