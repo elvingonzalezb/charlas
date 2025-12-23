@@ -183,3 +183,7 @@ https://repost.aws/es/knowledge-center/lambda-function-idempotent
 https://swpatterns.com/
 
 https://www.grahambrooks.com/architecture/
+
+https://docs.aws.amazon.com/powertools/
+
+https://github.com/elvingonzalezb/charlas/tree/lambda-event/lambda-event

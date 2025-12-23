@@ -202,3 +202,15 @@ Lambda Web Procesadora consume de SQS Web
 2 IAM Roles (receptor y procesador)
 
 2 IAM Role Policies
+
+## Ejemplo Event Bridge Pipe
+Flujo completo:
+Usuario actualiza producto en DynamoDB
+
+DynamoDB Streams captura el cambio
+
+EventBridge Pipe filtra solo INSERT/MODIFY
+
+Pipe transforma automáticamente el formato
+
+OpenSearch recibe el documento indexado
