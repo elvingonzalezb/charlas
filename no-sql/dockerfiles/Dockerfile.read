@@ -1,0 +1,19 @@
+FROM amazoncorretto:17-alpine
+
+WORKDIR /app
+
+# Copy Maven files
+COPY spring/read-service/pom.xml .
+COPY spring/read-service/src ./src
+
+# Install Maven
+RUN apk add --no-cache maven
+
+# Build the application
+RUN mvn clean package -DskipTests
+
+# Expose port
+EXPOSE 8081
+
+# Run the application
+CMD ["java", "-jar", "target/orders-read-service-1.0.0.jar"]
