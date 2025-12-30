@@ -1,0 +1,19 @@
+FROM amazoncorretto:17-alpine
+
+WORKDIR /app
+
+# Copy Maven files
+COPY spring/write-service/pom.xml .
+COPY spring/write-service/src ./src
+
+# Install Maven
+RUN apk add --no-cache maven
+
+# Build the application
+RUN mvn clean package -DskipTests
+
+# Expose port
+EXPOSE 8080
+
+# Run the application
+CMD ["java", "-jar", "target/orders-write-service-1.0.0.jar"]

@@ -1,0 +1,19 @@
+FROM amazoncorretto:17-alpine
+
+WORKDIR /app
+
+# Copy pom.xml first for better Docker layer caching
+COPY spring/sync-service/pom.xml .
+
+# Copy source code
+COPY spring/sync-service/src ./src
+
+# Install Maven and build the application
+RUN apk add --no-cache maven
+RUN mvn clean package -DskipTests
+
+# Expose port
+EXPOSE 8082
+
+# Run the application
+CMD ["java", "-jar", "target/orders-sync-service-1.0.0.jar"]
