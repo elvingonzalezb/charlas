@@ -1,0 +1,4 @@
+com/cqrs/kube/read/ReadController.class
+com/cqrs/kube/read/OrderViewRepository.class
+com/cqrs/kube/read/OrderView.class
+com/cqrs/kube/read/ReadServiceApplication.class
