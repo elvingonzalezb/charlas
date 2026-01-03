@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cqrs-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: cqrs.local
+    http:
+      paths:
+      - path: /read
+        pathType: Prefix
+        backend:
+          service:
+            name: read-service
+            port:
+              number: 8081
+      - path: /write
+        pathType: Prefix
+        backend:
+          service:
+            name: write-service
+            port:
+              number: 8080
