@@ -1,0 +1,4 @@
+com/cqrs/kube/write/WriteServiceApplication.class
+com/cqrs/kube/write/WriteController.class
+com/cqrs/kube/write/OrderRepository.class
+com/cqrs/kube/write/Order.class

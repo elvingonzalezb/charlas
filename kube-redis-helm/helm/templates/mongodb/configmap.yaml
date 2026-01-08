@@ -1,0 +1,27 @@
+{{- if .Values.mongodb.enabled }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "helm.fullname" . }}-mongodb-secret
+  labels:
+    {{- include "helm.labels" . | nindent 4 }}
+type: Opaque
+data:
+  mongodb-root-username: YWRtaW4=
+  mongodb-root-password: cGFzc3dvcmQxMjM=
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "helm.fullname" . }}-mongodb-init
+  labels:
+    {{- include "helm.labels" . | nindent 4 }}
+data:
+  init-mongo.js: |
+    db = db.getSiblingDB('PRUEBA');
+    db.createUser({
+      user: 'admin',
+      pwd: 'password123',
+      roles: [{ role: 'readWrite', db: 'PRUEBA' }]
+    });
+{{- end }}

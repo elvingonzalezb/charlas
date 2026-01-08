@@ -1,0 +1,44 @@
+{{- if .Values.writeService.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "helm.fullname" . }}-write-service
+  labels:
+    {{- include "helm.labels" . | nindent 4 }}
+    app.kubernetes.io/component: write-service
+spec:
+  replicas: {{ .Values.writeService.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "helm.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: write-service
+  template:
+    metadata:
+      labels:
+        {{- include "helm.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: write-service
+    spec:
+      containers:
+        - name: write-service
+          image: "{{ .Values.writeService.image.repository }}:{{ .Values.writeService.image.tag }}"
+          imagePullPolicy: {{ .Values.writeService.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: MONGODB_URL
+              value: "mongodb://admin:password123@{{ include "helm.fullname" . }}-mongodb:27017/PRUEBA?authSource=admin"
+            - name: SPRING_DATA_MONGODB_HOST
+              value: "{{ include "helm.fullname" . }}-mongodb"
+            - name: SPRING_DATA_MONGODB_PORT
+              value: "27017"
+            - name: SPRING_DATA_MONGODB_DATABASE
+              value: "PRUEBA"
+            - name: SPRING_DATA_MONGODB_USERNAME
+              value: "admin"
+            - name: SPRING_DATA_MONGODB_PASSWORD
+              value: "password123"
+          resources:
+            {{- toYaml .Values.writeService.resources | nindent 12 }}
+{{- end }}

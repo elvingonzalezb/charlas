@@ -1,0 +1,4 @@
+com/cqrs/kube/redis/RedisServiceApplication.class
+com/cqrs/kube/redis/RedisService.class
+com/cqrs/kube/redis/RedisConfig.class
+com/cqrs/kube/redis/RedisController.class
