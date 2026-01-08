@@ -3,10 +3,25 @@
 ## 📚 **Conceptos Fundamentales de Kubernetes**
 
 ### **¿Qué es Kubernetes (K8s)?**
+Kubernetes es una plataforma portable y extensible de código abierto para administrar cargas de trabajo y servicios.
 - **Orquestador de contenedores** desarrollado por Google
 - **Automatiza** despliegue, escalado y gestión de aplicaciones containerizadas
 - **Declarativo**: Describes el estado deseado, K8s lo mantiene
 - **Cloud-native**: Diseñado para aplicaciones distribuidas
+
+#### Componentes de Kubernetes
+
+#### **Control Plane (Plano de Control)**
+- **Cerebro del cluster** - toma todas las decisiones
+- **Componentes principales**:
+  - **API Server kube-apiserver**: Punto de entrada para todas las operaciones - expone api es el frontend
+  - **etcd**: Base de datos distribuida (estado del cluster) clave-valor
+  - **Scheduler kube-scheduler**: Decide dónde ejecutar los pods
+  - **Controller Manager kube-controller-manager**: Ejecuta controladores (Deployment, ReplicaSet, etc.)
+    - controlador de nodos - mantiene nodos
+    - controlador de replicacion - mantiene numero de pods
+    - controlador de endpoints
+    - controlador de tokens
 
 ### **Arquitectura de Kubernetes**
 
@@ -15,20 +30,13 @@
 - **Unidad básica** de computación en Kubernetes
 - **Compuesto por**: Control Plane + Worker Nodes
 
-#### **Control Plane (Plano de Control)**
-- **Cerebro del cluster** - toma todas las decisiones
-- **Componentes principales**:
-  - **API Server**: Punto de entrada para todas las operaciones
-  - **etcd**: Base de datos distribuida (estado del cluster)
-  - **Scheduler**: Decide dónde ejecutar los pods
-  - **Controller Manager**: Ejecuta controladores (Deployment, ReplicaSet, etc.)
-
 #### **Worker Nodes (Nodos)**
 - **Máquinas que ejecutan** las aplicaciones
 - **Componentes**:
-  - **kubelet**: Agente que comunica con Control Plane
-  - **Container Runtime**: Docker, containerd, CRI-O
-  - **kube-proxy**: Maneja networking y load balancing
+  - **kubelet**: Agente que comunica con Control Plane - en cada nodo - asegura contenedores corriendo en pods
+  - **Container Runtime**: El runtime de los contonedores - Docker, containerd, CRI-O
+  - **kube-proxy**: Maneja networking y load balancing - es decir abstrae servicio en k8 manteniendo reglas
+  - **Addons**: son pods y servicios que implementan funcionlidades del cluster
 
 ### **Objetos de Kubernetes**
 
