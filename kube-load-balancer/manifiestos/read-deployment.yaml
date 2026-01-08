@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: read-service-deployment
+  labels:
+    app: read-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: read-service
+  template:
+    metadata:
+      labels:
+        app: read-service
+    spec:
+      containers:
+      - name: read-service
+        image: localhost/cqrs-kube/read-service:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8081
+        env:
+        - name: MONGODB_URL
+          valueFrom:
+            secretKeyRef:
+              name: app-config-secret
+              key: MONGODB_URL
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "200m"
+        readinessProbe:
+          httpGet:
+            path: /read/health
+            port: 8081
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /read/health
+            port: 8081
+          initialDelaySeconds: 60
+          periodSeconds: 15
+      initContainers:
+      - name: wait-for-mongodb
+        image: docker.io/busybox:1.35
+        command: ['sh', '-c']
+        args:
+          - |
+            until nc -z mongodb-service 27017; do
+              echo "Waiting for MongoDB..."
+              sleep 2
+            done
+            echo "MongoDB is ready!"

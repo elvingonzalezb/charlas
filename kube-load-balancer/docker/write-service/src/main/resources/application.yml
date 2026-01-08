@@ -1,0 +1,26 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: write-service
+  
+  data:
+    mongodb:
+      uri: ${MONGODB_URL:mongodb://admin:password123@mongodb-service:27017/PRUEBA?authSource=admin}
+    
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    com.cqrs.kube.write: INFO
+    org.springframework.web: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
