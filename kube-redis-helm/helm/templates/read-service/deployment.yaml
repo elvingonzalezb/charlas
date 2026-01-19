@@ -1,0 +1,44 @@
+{{- if .Values.readService.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "helm.fullname" . }}-read-service
+  labels:
+    {{- include "helm.labels" . | nindent 4 }}
+    app.kubernetes.io/component: read-service
+spec:
+  replicas: {{ .Values.readService.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "helm.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: read-service
+  template:
+    metadata:
+      labels:
+        {{- include "helm.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: read-service
+    spec:
+      containers:
+        - name: read-service
+          image: "{{ .Values.readService.image.repository }}:{{ .Values.readService.image.tag }}"
+          imagePullPolicy: {{ .Values.readService.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8081
+              protocol: TCP
+          env:
+            - name: MONGODB_URL
+              value: "mongodb://admin:password123@{{ include "helm.fullname" . }}-mongodb:27017/PRUEBA?authSource=admin"
+            - name: SPRING_DATA_MONGODB_HOST
+              value: "{{ include "helm.fullname" . }}-mongodb"
+            - name: SPRING_DATA_MONGODB_PORT
+              value: "27017"
+            - name: SPRING_DATA_MONGODB_DATABASE
+              value: "PRUEBA"
+            - name: SPRING_DATA_MONGODB_USERNAME
+              value: "admin"
+            - name: SPRING_DATA_MONGODB_PASSWORD
+              value: "password123"
+          resources:
+            {{- toYaml .Values.readService.resources | nindent 12 }}
+{{- end }}

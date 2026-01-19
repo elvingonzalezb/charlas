@@ -1,0 +1,19 @@
+{{- if .Values.writeService.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "helm.fullname" . }}-write-service
+  labels:
+    {{- include "helm.labels" . | nindent 4 }}
+    app.kubernetes.io/component: write-service
+spec:
+  type: {{ .Values.writeService.service.type }}
+  ports:
+    - port: {{ .Values.writeService.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "helm.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: write-service
+{{- end }}

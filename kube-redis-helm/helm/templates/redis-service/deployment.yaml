@@ -1,0 +1,50 @@
+{{- if .Values.redisService.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "helm.fullname" . }}-redis-service
+  labels:
+    {{- include "helm.labels" . | nindent 4 }}
+    app.kubernetes.io/component: redis-service
+spec:
+  replicas: {{ .Values.redisService.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "helm.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: redis-service
+  template:
+    metadata:
+      labels:
+        {{- include "helm.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: redis-service
+    spec:
+      containers:
+        - name: redis-service
+          image: "{{ .Values.redisService.image.repository }}:{{ .Values.redisService.image.tag }}"
+          imagePullPolicy: {{ .Values.redisService.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8082
+              protocol: TCP
+          env:
+            - name: SPRING_REDIS_HOST
+              value: "{{ include "helm.fullname" . }}-redis"
+            - name: SPRING_REDIS_PORT
+              value: "6379"
+            - name: SPRING_APPLICATION_NAME
+              value: "redis-api-service"
+          resources:
+            {{- toYaml .Values.redisService.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+{{- end }}
